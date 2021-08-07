@@ -4,7 +4,7 @@ FROM node:16.3.0-alpine as nodebuild
 ARG TARGETARCH
 ARG FOCALBOARD_REF
 
-RUN apk add git
+RUN apk add git autoconf make gcc
 
 RUN git clone -b ${FOCALBOARD_REF} --depth 1 https://github.com/mattermost/focalboard.git /focalboard
 
@@ -18,7 +18,7 @@ FROM golang:1.16.5-alpine as gobuild
 ARG TARGETARCH
 ARG FOCALBOARD_REF
 
-RUN apk add git make gcc autoreconf
+RUN apk add git make gcc autoconf
 
 RUN git clone -b ${FOCALBOARD_REF} --depth 1 https://github.com/mattermost/focalboard.git /go/src/focalboard
 
