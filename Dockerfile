@@ -1,21 +1,47 @@
-FROM golang AS builder
+### Webapp build
+FROM node:16.3.0 as nodebuild
+
+RUN git clone -b ${FOCALBOARD_REF} --depth 1 https://github.com/mattermost/focalboard.git /focalboard
+
+WORKDIR /focalboard/webapp
+
+RUN npm install --no-optional && \
+    npm run pack
+
+FROM golang:1.16.5 as gobuild
+
+RUN git clone -b ${FOCALBOARD_REF} --depth 1 https://github.com/mattermost/focalboard.git /go/src/focalboard
+
+WORKDIR /go/src/focalboard
 
 ARG TARGETARCH
 ARG FOCALBOARD_REF
 
-RUN curl -fsSL https://deb.nodesource.com/setup_14.x | bash -
-RUN apt-get update
-RUN apt-get install -y nodejs autoconf
-RUN git clone -b ${FOCALBOARD_REF} --depth 1 https://github.com/mattermost/focalboard.git /focalboard
-WORKDIR /focalboard
 RUN sed -i "s/GOARCH=amd64/GOARCH=${TARGETARCH}/g" Makefile
-RUN make prebuild
-RUN make
-RUN make server-linux-package
-RUN tar xvzf dist/focalboard-server-*.tar.gz
+RUN  make server-linux
+RUN mkdir /data
 
-FROM debian:stable-slim
-COPY --from=builder /focalboard/focalboard/ /opt/focalboard/
+## Final image
+FROM gcr.io/distroless/base-debian10
+
 WORKDIR /opt/focalboard
-EXPOSE 8000
-CMD /opt/focalboard/bin/focalboard-server
+
+COPY --from=gobuild --chown=nobody:nobody /data /data
+COPY --from=nodebuild --chown=nobody:nobody /focalboard/webapp/pack pack/
+COPY --from=gobuild --chown=nobody:nobody /go/src/focalboard/bin/linux/focalboard-server bin/
+COPY --from=gobuild --chown=nobody:nobody /go/src/focalboard/LICENSE.txt LICENSE.txt
+COPY --from=gobuild --chown=nobody:nobody /go/src/focalboard/docker/server_config.json config.json
+
+USER nobody
+
+EXPOSE 8000/tcp
+
+EXPOSE 8000/tcp 9092/tcp
+
+VOLUME /data
+
+CMD ["/opt/focalboard/bin/focalboard-server"]
+
+VOLUME /data
+
+CMD ["/opt/focalboard/bin/focalboard-server"]
