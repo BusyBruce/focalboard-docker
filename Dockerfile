@@ -18,7 +18,7 @@ FROM golang:1.16.5-alpine as gobuild
 ARG TARGETARCH
 ARG FOCALBOARD_REF
 
-RUN apk add git make gcc
+RUN apk add git make gcc autoreconf
 
 RUN git clone -b ${FOCALBOARD_REF} --depth 1 https://github.com/mattermost/focalboard.git /go/src/focalboard
 
