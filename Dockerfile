@@ -1,7 +1,8 @@
+ARG TARGETARCH
+ARG FOCALBOARD_REF
+
 ### Webapp build
 FROM node:16.3.0-alpine as nodebuild
-
-RUN apk add git
 
 RUN git clone -b ${FOCALBOARD_REF} --depth 1 https://github.com/mattermost/focalboard.git /focalboard
 
@@ -12,14 +13,9 @@ RUN npm install --no-optional && \
 
 FROM golang:1.16.5-alpine as gobuild
 
-RUN apk add git
-
 RUN git clone -b ${FOCALBOARD_REF} --depth 1 https://github.com/mattermost/focalboard.git /go/src/focalboard
 
 WORKDIR /go/src/focalboard
-
-ARG TARGETARCH
-ARG FOCALBOARD_REF
 
 RUN sed -i "s/GOARCH=amd64/GOARCH=${TARGETARCH}/g" Makefile
 RUN  make server-linux
