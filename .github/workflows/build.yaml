@@ -1,19 +1,18 @@
-name: build
+name: Deploy Release Automated Build
 
 env:
-  DOCKERHUB_REPO: nicoulaj/focalboard
-  FOCALBOARD_MAJOR: 0
-  FOCALBOARD_MINOR: 6
-  FOCALBOARD_INCREMENT: 5
+  DOCKERHUB_REPO: flyskype2021/focalboard
 
+# Trigger on release
 on:
-  push:
-    branches:
-      - master
-  pull_request:
-    branches:
-      - master
-
+  repository_dispatch:
+    types: [focalboard]
+    branches: [master]
+    client_payload:
+      release_version:
+        description: "release focalboard version"
+        required: true
+        
 jobs:
   build:
 
@@ -27,12 +26,12 @@ jobs:
         with:
           images: ${{ env.DOCKERHUB_REPO }}
           label-custom: |
-            maintainer=nicoulaj
+            maintainer=flyskype2021
             org.opencontainers.image.title=focalboard
             org.opencontainers.image.description=Focalboard is an open source, self-hosted alternative to Trello, Notion, and Asana.
             org.opencontainers.image.url=https://www.focalboard.com
             org.opencontainers.image.licenses=Mattermost Licensing
-            org.opencontainers.image.version=${{ env.FOCALBOARD_MAJOR }}.${{ env.FOCALBOARD_MINOR }}.${{ env.FOCALBOARD_INCREMENT }}
+            org.opencontainers.image.version=${{github.event.client_payload.release_version}}
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
@@ -41,22 +40,19 @@ jobs:
         uses: docker/setup-buildx-action@v1
 
       - name: Login to DockerHub
-        if: github.event_name != 'pull_request'
         uses: docker/login-action@v1
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          username: ${{secrets.REGISTRY_USERNAME}}
+          password: ${{secrets.REGISTRY_PASSWORD}}
 
       - name: Build and push
         uses: docker/build-push-action@v2
         with:
           platforms: linux/amd64,linux/arm/v7,linux/arm64/v8
           pull: true
-          push: ${{ github.event_name != 'pull_request' }}
-          build-args: FOCALBOARD_REF=v${{ env.FOCALBOARD_MAJOR }}.${{ env.FOCALBOARD_MINOR }}.${{ env.FOCALBOARD_INCREMENT }}
+          push: true
+          build-args: FOCALBOARD_REF=v${{github.event.client_payload.release_version}}
           tags: |
-            ${{ env.DOCKERHUB_REPO }}:${{ env.FOCALBOARD_MAJOR }}.${{ env.FOCALBOARD_MINOR }}.${{ env.FOCALBOARD_INCREMENT }}
-            ${{ env.DOCKERHUB_REPO }}:${{ env.FOCALBOARD_MAJOR }}.${{ env.FOCALBOARD_MINOR }}
-            ${{ env.DOCKERHUB_REPO }}:${{ env.FOCALBOARD_MAJOR }}
+            ${{ env.DOCKERHUB_REPO }}:${{github.event.client_payload.release_version}}
             ${{ env.DOCKERHUB_REPO }}:latest
           labels: ${{ steps.docker_meta.outputs.labels }}
