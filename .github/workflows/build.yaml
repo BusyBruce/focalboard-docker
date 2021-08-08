@@ -26,6 +26,7 @@ jobs:
         with:
           repository: mattermost/focalboard
           ref: v${{github.event.client_payload.release_version}}
+          path: ''
           
       - name: Generate Docker image labels
         uses: crazy-max/ghaction-docker-meta@v2.5.0
