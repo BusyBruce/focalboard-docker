@@ -63,7 +63,9 @@ jobs:
           platforms: linux/amd64,linux/arm/v7,linux/arm64/v8
           pull: true
           push: true
-          build-args: FOCALBOARD_REF=v${{github.event.client_payload.release_version}}
+          build-args: |
+            FOCALBOARD_REF=v${{github.event.client_payload.release_version}}
+            FOCALBOARD_PATH=${{ github.workspace }}/focalboard
           tags: |
             ${{ env.DOCKERHUB_REPO }}:${{github.event.client_payload.release_version}}
             ${{ env.DOCKERHUB_REPO }}:latest
