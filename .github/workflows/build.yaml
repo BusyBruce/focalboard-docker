@@ -54,11 +54,7 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: '16'
-      - run: |
-          ls ${{ github.workspace }}
-      - run: cd ${{ github.workspace }}/focalboard/webapp
-      - run: npm install --no-optional
-      - run: npm run pack
+      - run: cd ${{ github.workspace }}/focalboard/webapp && npm install --no-optional && npm run pack
 
       - name: Build and push
         uses: docker/build-push-action@v2
