@@ -1,25 +1,10 @@
-### Fetch Repository
-FROM bitnami/git as repo
-
-ARG FOCALBOARD_REF
-
-RUN git clone -b ${FOCALBOARD_REF} --depth 1 https://github.com/mattermost/focalboard.git /focalboard
-
-### Webapp build
-FROM node:16.3.0 as nodebuild
-
-RUN mkdir /app
-WORKDIR /app
-RUN wget https://github.com/mattermost/focalboard/releases/download/v0.8.0/focalboard-server-linux-amd64.tar.gz
-RUN tar -xvf focalboard-server-linux-amd64.tar.gz
-WORKDIR /app/focalboard
-
 FROM golang:1.16.5 as gobuild
 
 ARG TARGETARCH
+ARG FOCALBOARD_PATH
 
 WORKDIR /go/src/focalboard
-COPY --from=repo /focalboard /go/src/focalboard
+COPY /${FOCALBOARD_PATH}/focalboard /go/src/focalboard
 
 RUN sed -i "s/GOARCH=amd64/GOARCH=${TARGETARCH}/g" Makefile
 RUN  make server-linux
@@ -31,7 +16,7 @@ FROM gcr.io/distroless/base-debian10
 WORKDIR /opt/focalboard
 
 COPY --from=gobuild --chown=nobody:nobody /data /data
-COPY --from=nodebuild --chown=nobody:nobody /app/focalboard/pack pack/
+COPY --chown=nobody:nobody /${FOCALBOARD_PATH}/focalboard/webapp/pack pack/
 COPY --from=gobuild --chown=nobody:nobody /go/src/focalboard/bin/linux/focalboard-server bin/
 COPY --from=gobuild --chown=nobody:nobody /go/src/focalboard/LICENSE.txt LICENSE.txt
 COPY --from=gobuild --chown=nobody:nobody /go/src/focalboard/docker/server_config.json config.json
