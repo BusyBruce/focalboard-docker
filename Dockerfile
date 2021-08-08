@@ -8,11 +8,11 @@ RUN git clone -b ${FOCALBOARD_REF} --depth 1 https://github.com/mattermost/focal
 ### Webapp build
 FROM node:16.3.0 as nodebuild
 
-WORKDIR /webapp
-COPY --from=repo /focalboard/webapp /webapp
-
-RUN npm install --no-optional && \
-    npm run pack
+RUN mkdir /app
+WORKDIR /app
+RUN wget https://github.com/mattermost/focalboard/releases/download/v0.8.0/focalboard-server-linux-amd64.tar.gz
+RUN tar -xvf focalboard-server-linux-amd64.tar.gz
+WORKDIR /app/focalboard
 
 FROM golang:1.16.5 as gobuild
 
@@ -31,7 +31,7 @@ FROM gcr.io/distroless/base-debian10
 WORKDIR /opt/focalboard
 
 COPY --from=gobuild --chown=nobody:nobody /data /data
-COPY --from=nodebuild --chown=nobody:nobody /webapp/pack pack/
+COPY --from=nodebuild --chown=nobody:nobody /app/focalboard/pack pack/
 COPY --from=gobuild --chown=nobody:nobody /go/src/focalboard/bin/linux/focalboard-server bin/
 COPY --from=gobuild --chown=nobody:nobody /go/src/focalboard/LICENSE.txt LICENSE.txt
 COPY --from=gobuild --chown=nobody:nobody /go/src/focalboard/docker/server_config.json config.json
