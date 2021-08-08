@@ -1,8 +1,15 @@
+### Fetch Repository
+FROM bitnami/git as repo
+
+ARG FOCALBOARD_REF
+
+RUN git clone -b ${FOCALBOARD_REF} --depth 1 https://github.com/mattermost/focalboard.git /focalboard
+
 ### Webapp build
 FROM node:16.3.0 as nodebuild
 
 WORKDIR /webapp
-ADD ${GITHUB_WORKSPACE}/focalboard/webapp /webapp
+COPY --from=repo /focalboard/webapp /webapp
 
 RUN npm install --no-optional && \
     npm run pack
@@ -10,10 +17,9 @@ RUN npm install --no-optional && \
 FROM golang:1.16.5 as gobuild
 
 ARG TARGETARCH
-ARG FOCALBOARD_REF
 
 WORKDIR /go/src/focalboard
-ADD ${GITHUB_WORKSPACE}/focalboard /go/src/focalboard
+COPY --from=repo /focalboard /go/src/focalboard
 
 RUN sed -i "s/GOARCH=amd64/GOARCH=${TARGETARCH}/g" Makefile
 RUN  make server-linux
