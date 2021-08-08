@@ -50,11 +50,11 @@ jobs:
         with:
           repository: mattermost/focalboard
           ref: v${{github.event.client_payload.release_version}}
-          path: focalboard
-      - run: cd focalboard 
+          path: focalboard 
       - uses: actions/setup-node@v2
         with:
           node-version: '16'
+      - run: cd ${{ github.workspace }}/focalboard/webapp
       - run: npm install --no-optional
       - run: npm run pack
 
