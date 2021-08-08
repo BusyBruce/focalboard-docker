@@ -2,7 +2,7 @@
 FROM node:16.3.0 as nodebuild
 
 WORKDIR /webapp
-ADD ./focalboard/webapp /webapp
+ADD ${GITHUB_WORKSPACE}/focalboard/webapp /webapp
 
 RUN npm install --no-optional && \
     npm run pack
@@ -13,7 +13,7 @@ ARG TARGETARCH
 ARG FOCALBOARD_REF
 
 WORKDIR /go/src/focalboard
-ADD ./focalboard /go/src/focalboard
+ADD ${GITHUB_WORKSPACE}/focalboard /go/src/focalboard
 
 RUN sed -i "s/GOARCH=amd64/GOARCH=${TARGETARCH}/g" Makefile
 RUN  make server-linux
