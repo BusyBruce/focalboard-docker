@@ -1,28 +1,19 @@
 ### Webapp build
-FROM node:16.3.0-alpine as nodebuild
+FROM node:16.3.0 as nodebuild
 
-ARG TARGETARCH
-ARG FOCALBOARD_REF
-
-RUN apk add git gcc automake autoconf libtool musl-dev nasm cmake
-
-RUN git clone -b ${FOCALBOARD_REF} --depth 1 https://github.com/mattermost/focalboard.git /focalboard
-
-WORKDIR /focalboard/webapp
+WORKDIR /webapp
+ADD ./focalboard/webapp /webapp
 
 RUN npm install --no-optional && \
     npm run pack
 
-FROM golang:1.16.5-alpine as gobuild
+FROM golang:1.16.5 as gobuild
 
 ARG TARGETARCH
 ARG FOCALBOARD_REF
 
-RUN apk add git gcc automake autoconf libtool musl-dev nasm cmake
-
-RUN git clone -b ${FOCALBOARD_REF} --depth 1 https://github.com/mattermost/focalboard.git /go/src/focalboard
-
 WORKDIR /go/src/focalboard
+ADD ./focalboard /go/src/focalboard
 
 RUN sed -i "s/GOARCH=amd64/GOARCH=${TARGETARCH}/g" Makefile
 RUN  make server-linux
