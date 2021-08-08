@@ -49,6 +49,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           repository: mattermost/focalboard
+          ref: v${{github.event.client_payload.release_version}}
           path: focalboard
       - run: cd focalboard 
       - uses: actions/setup-node@v2
