@@ -44,6 +44,18 @@ jobs:
         with:
           username: ${{secrets.REGISTRY_USERNAME}}
           password: ${{secrets.REGISTRY_PASSWORD}}
+          
+      - name: Checkout focalboard repo
+        uses: actions/checkout@v2
+        with:
+          repository: mattermost/focalboard
+          path: focalboard
+      - run: cd focalboard 
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+      - run: npm install --no-optional
+      - run: npm run pack
 
       - name: Build and push
         uses: docker/build-push-action@v2
