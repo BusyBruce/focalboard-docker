@@ -13,6 +13,9 @@ RUN mkdir /data
 ## Final image
 FROM gcr.io/distroless/base-debian10
 
+ARG TARGETARCH
+ARG FOCALBOARD_PATH
+
 WORKDIR /opt/focalboard
 
 COPY --from=gobuild --chown=nobody:nobody /data /data
