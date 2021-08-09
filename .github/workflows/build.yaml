@@ -44,27 +44,27 @@ jobs:
         with:
           username: ${{secrets.REGISTRY_USERNAME}}
           password: ${{secrets.REGISTRY_PASSWORD}}
-          
-      - name: Checkout focalboard repo
-        uses: actions/checkout@v2
-        with:
-          repository: mattermost/focalboard
-          ref: v${{github.event.client_payload.release_version}}
-          path: focalboard 
-      - uses: actions/setup-node@v2
-        with:
-          node-version: '16'
-      - run: cd ${{ github.workspace }}/focalboard/webapp && npm install --no-optional && npm run pack
 
       - name: Build and push
         uses: docker/build-push-action@v2
         with:
-          platforms: linux/amd64,linux/arm/v7,linux/arm64/v8
+          platforms: linux/amd64,linux/arm/v7
           pull: true
           push: true
-          build-args: |
-            FOCALBOARD_REF=v${{github.event.client_payload.release_version}}
-            FOCALBOARD_PATH=${{ github.workspace }}/focalboard
+          build-args: FOCALBOARD_REF=v${{github.event.client_payload.release_version}}
+          tags: |
+            ${{ env.DOCKERHUB_REPO }}:${{github.event.client_payload.release_version}}
+            ${{ env.DOCKERHUB_REPO }}:latest
+          labels: ${{ steps.docker_meta.outputs.labels }}
+
+      - name: ARM64 Build and push
+        uses: docker/build-push-action@v2
+        with:
+          platforms: linux/arm64/v8
+          path: Dockerfile-arm64
+          pull: true
+          push: true
+          build-args: FOCALBOARD_REF=v${{github.event.client_payload.release_version}}
           tags: |
             ${{ env.DOCKERHUB_REPO }}:${{github.event.client_payload.release_version}}
             ${{ env.DOCKERHUB_REPO }}:latest
