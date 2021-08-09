@@ -11,7 +11,8 @@ FROM node:16.3.0 as nodebuild
 WORKDIR /webapp
 COPY --from=repo /focalboard/webapp /webapp
 
-RUN npm install --no-optional && \
+RUN export CFLAGS="$CFLAGS -DPNG_ARM_NEON_OPT=0" && \
+    npm install --no-optional && \
     npm run pack
 
 FROM golang:1.16.5 as gobuild

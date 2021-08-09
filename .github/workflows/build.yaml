@@ -45,23 +45,10 @@ jobs:
           username: ${{secrets.REGISTRY_USERNAME}}
           password: ${{secrets.REGISTRY_PASSWORD}}
 
-      - name: ARM64 Build and push
-        uses: docker/build-push-action@v2
-        with:
-          platforms: linux/arm64/v8
-          file: Dockerfile-arm64
-          pull: true
-          push: true
-          build-args: FOCALBOARD_REF=v${{github.event.client_payload.release_version}}
-          tags: |
-            ${{ env.DOCKERHUB_REPO }}:${{github.event.client_payload.release_version}}
-            ${{ env.DOCKERHUB_REPO }}:latest
-          labels: ${{ steps.docker_meta.outputs.labels }}
-
       - name: Build and push
         uses: docker/build-push-action@v2
         with:
-          platforms: linux/amd64,linux/arm/v7
+          platforms: linux/amd64,linux/arm/v7,linux/arm64/v8
           pull: true
           push: true
           build-args: FOCALBOARD_REF=v${{github.event.client_payload.release_version}}
