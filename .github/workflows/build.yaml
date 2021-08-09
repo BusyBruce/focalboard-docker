@@ -49,7 +49,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           platforms: linux/arm64/v8
-          path: Dockerfile-arm64
+          file: Dockerfile-arm64
           pull: true
           push: true
           build-args: FOCALBOARD_REF=v${{github.event.client_payload.release_version}}
