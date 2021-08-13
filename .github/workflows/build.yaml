@@ -45,7 +45,9 @@ jobs:
           username: ${{secrets.REGISTRY_USERNAME}}
           password: ${{secrets.REGISTRY_PASSWORD}}
       
-      - name: Sync ReadMe To DockerHub
+      - uses: actions/checkout@master
+      
+      - name: Sync README To DockerHub
         uses: meeDamian/sync-readme@v1.0.6
         with:
           user: ${{secrets.REGISTRY_USERNAME}}
