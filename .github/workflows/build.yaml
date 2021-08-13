@@ -44,9 +44,29 @@ jobs:
         with:
           username: ${{secrets.REGISTRY_USERNAME}}
           password: ${{secrets.REGISTRY_PASSWORD}}
+      
+      - name: Sync ReadMe To DockerHub
+        uses: meeDamian/sync-readme@v1.0.6
+        with:
+          user: ${{secrets.REGISTRY_USERNAME}}
+          pass: ${{secrets.REGISTRY_PASSWORD}}
+          slug: ${{ env.DOCKERHUB_REPO }}
 
       - name: Build and push
         uses: docker/build-push-action@v2
+        if: contains(${{github.event.client_payload.release_version}}, 'rc') == 'true'
+        with:
+          platforms: linux/amd64,linux/arm/v7,linux/arm64/v8
+          pull: true
+          push: true
+          build-args: FOCALBOARD_REF=v${{github.event.client_payload.release_version}}
+          tags: |
+            ${{ env.DOCKERHUB_REPO }}:${{github.event.client_payload.release_version}}
+          labels: ${{ steps.docker_meta.outputs.labels }}
+          
+      - name: Build and push
+        uses: docker/build-push-action@v2
+        if: contains(${{github.event.client_payload.release_version}}, 'rc') == 'false'
         with:
           platforms: linux/amd64,linux/arm/v7,linux/arm64/v8
           pull: true
