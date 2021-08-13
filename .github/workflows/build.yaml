@@ -12,7 +12,9 @@ on:
       release_version:
         description: "release focalboard version"
         required: true
-        
+      release_tag:
+        description: "release focalboard tag"
+        required: true
 jobs:
   build:
 
@@ -61,7 +63,7 @@ jobs:
           platforms: linux/amd64,linux/arm/v7,linux/arm64/v8
           pull: true
           push: true
-          build-args: FOCALBOARD_REF=v${{github.event.client_payload.release_version}}
+          build-args: FOCALBOARD_REF=${{github.event.client_payload.release_tag}}
           tags: |
             ${{ env.DOCKERHUB_REPO }}:${{github.event.client_payload.release_version}}
           labels: ${{ steps.docker_meta.outputs.labels }}
@@ -73,7 +75,7 @@ jobs:
           platforms: linux/amd64,linux/arm/v7,linux/arm64/v8
           pull: true
           push: true
-          build-args: FOCALBOARD_REF=v${{github.event.client_payload.release_version}}
+          build-args: FOCALBOARD_REF=${{github.event.client_payload.release_tag}}
           tags: |
             ${{ env.DOCKERHUB_REPO }}:${{github.event.client_payload.release_version}}
             ${{ env.DOCKERHUB_REPO }}:latest
