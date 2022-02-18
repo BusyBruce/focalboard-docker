@@ -60,7 +60,7 @@ jobs:
         uses: docker/build-push-action@v2
         if: ${{contains(github.event.client_payload.release_version, 'rc')}}
         with:
-          platforms: linux/amd64,linux/arm/v7,linux/arm64/v8
+          platforms: linux/amd64,linux/arm64/v8
           pull: true
           push: true
           build-args: FOCALBOARD_REF=${{github.event.client_payload.release_tag}}
@@ -72,7 +72,7 @@ jobs:
         uses: docker/build-push-action@v2
         if: ${{!contains(github.event.client_payload.release_version, 'rc')}}
         with:
-          platforms: linux/amd64,linux/arm/v7,linux/arm64/v8
+          platforms: linux/amd64,linux/arm64/v8
           pull: true
           push: true
           build-args: FOCALBOARD_REF=${{github.event.client_payload.release_tag}}
