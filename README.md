@@ -1,9 +1,9 @@
-focalboard Docker images [![build](https://github.com/nicoulaj/focalboard-docker/actions/workflows/build.yaml/badge.svg)](https://github.com/nicoulaj/focalboard-docker/actions/workflows/build.yaml)
+focalboard Docker images [![build](https://github.com/BusyBruce/focalboard-docker/actions/workflows/build.yaml/badge.svg)](https://github.com/BusyBruce/focalboard-docker/actions/workflows/build.yaml)
 =========================
 
 Cross platform Docker images for [focalboard](https://www.focalboard.com).
 
-The images are available at Dockerhub: [`nicoulaj/focalboard`](https://hub.docker.com/r/nicoulaj/focalboard).
+The images are available at Dockerhub: [`flyskype2021/focalboard`](https://hub.docker.com/r/flyskype2021/focalboard).
 
 Usage
 -----
@@ -11,7 +11,7 @@ Usage
 ### docker
 
 ```
-docker run -p 8000:8000 nicoulaj/focalboard
+docker run -p 8000:8000 flyskype2021/focalboard
 ```
 
 ### docker-compose
@@ -42,7 +42,7 @@ docker run -p 8000:8000 nicoulaj/focalboard
     ```
     services:
       focalboard:
-        image: nicoulaj/focalboard
+        image: flyskype2021/focalboard
         volumes:
         - ./config.json:/opt/focalboard/config.json
         - /var/lib/focalboard:/var/lib/focalboard
