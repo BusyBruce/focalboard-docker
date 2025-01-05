@@ -23,7 +23,7 @@ WORKDIR /go/src/focalboard
 COPY --from=repo /focalboard /go/src/focalboard
 
 RUN sed -i "s/GOARCH=amd64/GOARCH=${TARGETARCH}/g" Makefile
-RUN EXCLUDE_PLUGIN=true EXCLUDE_SERVER=true EXCLUDE_ENTERPRISE=true make server-linux
+RUN EXCLUDE_PLUGIN=true EXCLUDE_SERVER=true EXCLUDE_ENTERPRISE=true make server-linux arch=${TARGETARCH}
 RUN mkdir /data
 
 ## Final image
